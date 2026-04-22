@@ -144,19 +144,50 @@ Reads all 200 `beginner_description` MovementDescriptor rows from PostgreSQL, ge
 - **Metadata per document:** `exercise_id` (UUID string) and `exercise_name` for join-back.
 - **Idempotent:** re-running overwrites existing embeddings with fresh vectors.
 
-### Phase 3: RAG Search Endpoint ✅
+### Phase 3: Two-Stage RAG Search Endpoint ✅
 
-**Endpoint:** `POST /search/text`
+**Endpoint:** `POST /search/text` (v0.3.0)
 
-The FastAPI app (`main.py`) exposes a search endpoint that implements the full RAG pipeline:
+The search endpoint uses a **Two-Stage Retrieval** architecture to solve semantic vector collisions (e.g., "pushing the floor" incorrectly matching "Leg Press" because "platform" ≈ "floor" in vector space).
 
-1. **Embed** — The user's query string is embedded locally via `nomic-embed-text` (Ollama).
-2. **Search** — The query vector is compared against all 200 beginner_description embeddings in ChromaDB using cosine similarity. The top-K nearest neighbours are returned.
-3. **Deduplicate** — Multiple descriptions from the same exercise are collapsed. Only the best-matching description per exercise is kept.
-4. **Join** — The `exercise_id` UUIDs from ChromaDB metadata are used to fetch full exercise records from PostgreSQL (including muscles, equipment, aliases, all descriptors).
-5. **Return** — A ranked JSON response with similarity scores, the matched description text, and the complete `ExerciseRead` schema for each hit.
+```
+User Query
+    │
+    ▼
+┌─────────────────────────────────────────┐
+│  Stage 1: Vector Retrieval              │
+│  nomic-embed-text → ChromaDB            │
+│  Top-7 unique exercises (expanded pool) │
+└────────────────┬────────────────────────┘
+                 │ 7 candidates + descriptions
+                 ▼
+┌─────────────────────────────────────────┐
+│  Stage 2: LLM Re-ranking               │
+│  gemma4:e4b (expert biomechanist judge) │
+│  Evaluates physical mechanics:          │
+│  • Body position (sit/stand/lie)        │
+│  • Force direction (push/pull)          │
+│  • Equipment context (floor vs machine) │
+│  Returns: confidence_score + reasoning  │
+└────────────────┬────────────────────────┘
+                 │ Re-sorted by LLM confidence
+                 ▼
+        Top-3 results returned
+```
 
-**Verified working queries:**
+**Pipeline detail:**
+
+1. **Embed** — User query → `nomic-embed-text` → 768-dim vector.
+2. **Stage 1 — ChromaDB** — Cosine kNN over 200 beginner_descriptions. Over-fetches (`top_k * 3`) then deduplicates to 7 unique exercises.
+3. **Fetch** — Load full exercise records from PostgreSQL for all 7 candidates.
+4. **Stage 2 — LLM Judge** — Send user query + candidate dossiers (name, force_type, all 4 beginner_descriptions) to `gemma4:e4b` with a strict biomechanist system prompt. The LLM returns a JSON array with `exercise_id`, `confidence_score` (0–1), and `reasoning` (1-sentence explanation).
+5. **Re-sort** — Candidates sorted by LLM confidence score. Top-K returned to the frontend.
+
+**Fallback strategy:** If the LLM call fails (network error, JSON parse failure, too few scores returned), the endpoint **falls back gracefully** to the original vector similarity ranking. The user always gets results.
+
+**Response schema** now includes a `reasoning` field — the LLM's 1-sentence explanation of why it scored each exercise as it did. This is displayed on both the ExerciseCard and ExerciseModal in the frontend.
+
+**Verified working queries (pre-LLM baseline):**
 - *"sitting down pulling the bar to my chest"* → **#1 Lat Pulldown** (0.77 similarity)
 - *"lying on my back pushing a heavy bar up from my chest"* → **#3 Barbell Bench Press** (0.76 similarity)
 

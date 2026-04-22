@@ -8,7 +8,7 @@ import {
   Target,
   Activity,
   Play,
-  RotateCcw,
+  Plus,
 } from "lucide-react";
 import { SearchResultItem } from "@/lib/types";
 import ConfidenceRing from "./ConfidenceRing";
@@ -16,6 +16,7 @@ import ConfidenceRing from "./ConfidenceRing";
 interface ExerciseModalProps {
   result: SearchResultItem | null;
   onClose: () => void;
+  onAddToWorkout?: (exerciseName: string) => void;
 }
 
 function formatLabel(value: string): string {
@@ -24,7 +25,11 @@ function formatLabel(value: string): string {
     .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-export default function ExerciseModal({ result, onClose }: ExerciseModalProps) {
+export default function ExerciseModal({
+  result,
+  onClose,
+  onAddToWorkout,
+}: ExerciseModalProps) {
   return (
     <AnimatePresence>
       {result && (
@@ -49,15 +54,25 @@ export default function ExerciseModal({ result, onClose }: ExerciseModalProps) {
               {/* Header */}
               <div className="flex items-start justify-between mb-6">
                 <div className="flex items-center gap-4">
-                  <ConfidenceRing score={result.similarity_score} size={72} strokeWidth={4} />
+                  <ConfidenceRing
+                    score={result.similarity_score}
+                    size={72}
+                    strokeWidth={4}
+                  />
                   <div>
                     <h2 className="text-2xl font-bold text-white">
                       {result.exercise.primary_name}
                     </h2>
                     <div className="mt-1 flex items-center gap-2 text-sm text-neutral-500">
-                      <span className="capitalize">{result.exercise.difficulty}</span>
+                      <span className="capitalize">
+                        {result.exercise.difficulty}
+                      </span>
                       <span className="text-neutral-700">·</span>
-                      <span>{result.exercise.mechanic === "compound" ? "Compound" : "Isolation"}</span>
+                      <span>
+                        {result.exercise.mechanic === "compound"
+                          ? "Compound"
+                          : "Isolation"}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -92,13 +107,18 @@ export default function ExerciseModal({ result, onClose }: ExerciseModalProps) {
                 </div>
               )}
 
-              {/* Matched description */}
+              {/* Why this matched — LLM reasoning + vector match */}
               <div className="mb-6 rounded-2xl bg-accent/[0.04] border border-accent/10 p-4">
                 <h3 className="text-xs font-semibold uppercase tracking-wider text-accent-light/60 mb-2">
                   Why this matched
                 </h3>
-                <p className="text-sm text-neutral-400 leading-relaxed italic">
-                  &ldquo;{result.matched_description}&rdquo;
+                {result.reasoning && (
+                  <p className="text-sm text-accent-light/80 leading-relaxed mb-2">
+                    {result.reasoning}
+                  </p>
+                )}
+                <p className="text-sm text-neutral-500 leading-relaxed italic">
+                  Vector match: &ldquo;{result.matched_description}&rdquo;
                 </p>
               </div>
 
@@ -129,7 +149,7 @@ export default function ExerciseModal({ result, onClose }: ExerciseModalProps) {
 
               {/* Aliases */}
               {result.exercise.aliases.length > 0 && (
-                <div className="mb-6">
+                <div className="mb-8">
                   <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-500 mb-2.5">
                     Also known as
                   </h3>
@@ -146,25 +166,16 @@ export default function ExerciseModal({ result, onClose }: ExerciseModalProps) {
                 </div>
               )}
 
-              {/* All beginner descriptions */}
-              <div>
-                <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-500 mb-2.5 flex items-center gap-1.5">
-                  <RotateCcw className="h-3.5 w-3.5" />
-                  All Descriptions
-                </h3>
-                <div className="space-y-2">
-                  {result.exercise.movement_descriptors
-                    .filter((d) => d.category === "beginner_description")
-                    .map((d) => (
-                      <div
-                        key={d.id}
-                        className="rounded-xl bg-white/[0.02] border border-white/[0.04] px-4 py-2.5 text-sm text-neutral-400 leading-relaxed"
-                      >
-                        &ldquo;{d.text}&rdquo;
-                      </div>
-                    ))}
-                </div>
-              </div>
+              {/* Add to Workout CTA */}
+              <button
+                onClick={() =>
+                  onAddToWorkout?.(result.exercise.primary_name)
+                }
+                className="w-full flex items-center justify-center gap-2.5 rounded-2xl bg-accent py-4 text-sm font-semibold text-white hover:bg-accent-light active:scale-[0.98] transition-all duration-200 shadow-lg shadow-accent/20"
+              >
+                <Plus className="h-5 w-5" />
+                Add to Workout
+              </button>
             </div>
           </motion.div>
         </>

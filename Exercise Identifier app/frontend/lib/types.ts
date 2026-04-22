@@ -38,6 +38,7 @@ export interface SearchResultItem {
   rank: number;
   similarity_score: number;
   matched_description: string;
+  reasoning: string;
   exercise: Exercise;
 }
 

@@ -22,7 +22,7 @@ export default function ExerciseCard({
   index,
   onClick,
 }: ExerciseCardProps) {
-  const { exercise, similarity_score, matched_description } = result;
+  const { exercise, similarity_score, matched_description, reasoning } = result;
 
   return (
     <motion.div
@@ -37,15 +37,15 @@ export default function ExerciseCard({
       onClick={onClick}
       className="glass-card glass-card-hover group cursor-pointer rounded-3xl p-5 sm:p-6 transition-all duration-300 hover:scale-[1.01] active:scale-[0.99]"
     >
-      <div className="flex items-start gap-4">
-        {/* Confidence Ring */}
-        <ConfidenceRing score={similarity_score} />
+      <div className="flex items-start gap-3.5">
+        {/* De-emphasized Confidence Ring */}
+        <ConfidenceRing score={similarity_score} size={44} strokeWidth={3} />
 
         {/* Content */}
         <div className="flex-1 min-w-0">
-          {/* Name + difficulty */}
-          <div className="flex items-center gap-2.5 mb-1.5">
-            <h3 className="text-lg font-semibold text-white truncate">
+          {/* Name + difficulty — elevated title */}
+          <div className="flex items-center gap-2.5 mb-1">
+            <h3 className="text-xl font-bold text-white truncate">
               {exercise.primary_name}
             </h3>
             <span className="flex-shrink-0 rounded-md bg-white/[0.04] border border-white/[0.06] px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-neutral-400">
@@ -53,12 +53,21 @@ export default function ExerciseCard({
             </span>
           </div>
 
-          {/* Matched description */}
-          <p className="text-sm text-neutral-500 leading-relaxed line-clamp-2 mb-3">
-            &ldquo;{matched_description}&rdquo;
-          </p>
+          {/* LLM Reasoning */}
+          {reasoning && (
+            <p className="text-sm text-accent-light/70 leading-relaxed line-clamp-2 mb-2">
+              {reasoning}
+            </p>
+          )}
 
-          {/* Muscle pills */}
+          {/* Matched description (fallback if no reasoning) */}
+          {!reasoning && (
+            <p className="text-sm text-neutral-500 leading-relaxed line-clamp-2 mb-2.5">
+              &ldquo;{matched_description}&rdquo;
+            </p>
+          )}
+
+          {/* Muscle pills — fixed contrast */}
           <div className="flex flex-wrap gap-1.5">
             {exercise.primary_muscles.map((m) => (
               <span key={m} className="muscle-pill-primary">
@@ -66,7 +75,10 @@ export default function ExerciseCard({
               </span>
             ))}
             {exercise.secondary_muscles.slice(0, 3).map((m) => (
-              <span key={m} className="muscle-pill">
+              <span
+                key={m}
+                className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-medium tracking-wide uppercase bg-white/10 text-neutral-300 border border-white/[0.08]"
+              >
                 {formatLabel(m)}
               </span>
             ))}

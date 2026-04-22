@@ -17,6 +17,7 @@ export default function Home() {
     null
   );
   const [error, setError] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
   const handleSearch = useCallback(async (query: string) => {
     setIsLoading(true);
@@ -36,6 +37,11 @@ export default function Home() {
     } finally {
       setIsLoading(false);
     }
+  }, []);
+
+  const handleAddToWorkout = useCallback((exerciseName: string) => {
+    setSelectedResult(null);
+    setSuccessMsg(`${exerciseName} added to workout`);
   }, []);
 
   return (
@@ -122,6 +128,7 @@ export default function Home() {
       <ExerciseModal
         result={selectedResult}
         onClose={() => setSelectedResult(null)}
+        onAddToWorkout={handleAddToWorkout}
       />
 
       {/* Error Toast */}
@@ -129,6 +136,15 @@ export default function Home() {
         message={error || ""}
         visible={!!error}
         onDismiss={() => setError(null)}
+        variant="error"
+      />
+
+      {/* Success Toast */}
+      <Toast
+        message={successMsg || ""}
+        visible={!!successMsg}
+        onDismiss={() => setSuccessMsg(null)}
+        variant="success"
       />
     </main>
   );
