@@ -2,11 +2,11 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Exercise Identifier",
-  description: "Identify gym strength-training exercises from text or video.",
+  title: "Identify — Exercise Finder",
+  description:
+    "Describe any gym exercise in your own words and instantly identify it using AI-powered biomechanics analysis.",
 };
 
-// Mobile-first + PWA-friendly viewport defaults.
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
@@ -20,8 +20,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className="min-h-screen bg-neutral-950 text-neutral-100 antialiased">
+    <html lang="en" className="dark">
+      <body className="min-h-screen bg-surface text-neutral-100 antialiased font-sans">
         {children}
       </body>
     </html>

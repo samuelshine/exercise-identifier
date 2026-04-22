@@ -10,3 +10,6 @@ pydantic-settings>=2.5.2
 # Local AI ingestion
 ollama>=0.3.3
 tqdm>=4.66.5
+
+# Vector database
+chromadb>=1.0.0

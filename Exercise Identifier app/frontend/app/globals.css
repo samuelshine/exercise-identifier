@@ -2,9 +2,111 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Mobile-first baseline. PWA-friendly viewport behaviors live here. */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
+
 html,
 body {
   height: 100%;
   -webkit-tap-highlight-color: transparent;
+  scroll-behavior: smooth;
+}
+
+/* ── Glassmorphism card surfaces ─────────────────────────────────── */
+
+.glass-card {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.03) 0%,
+    rgba(255, 255, 255, 0.01) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.glass-card-hover:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(255, 255, 255, 0.02) 100%
+  );
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ── Search input glow ───────────────────────────────────────────── */
+
+.search-glow {
+  transition: box-shadow 0.4s ease, border-color 0.4s ease;
+}
+
+.search-glow:focus-within {
+  box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.3),
+    0 0 30px rgba(99, 102, 241, 0.12), 0 0 60px rgba(99, 102, 241, 0.06);
+  border-color: rgba(99, 102, 241, 0.4);
+}
+
+/* ── Confidence ring SVG ─────────────────────────────────────────── */
+
+.confidence-ring-track {
+  stroke: rgba(255, 255, 255, 0.06);
+}
+
+.confidence-ring-fill {
+  transition: stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1);
+  filter: drop-shadow(0 0 6px var(--ring-color));
+}
+
+/* ── Shimmer loading skeleton ────────────────────────────────────── */
+
+.shimmer-bg {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.03) 25%,
+    rgba(255, 255, 255, 0.06) 50%,
+    rgba(255, 255, 255, 0.03) 75%
+  );
+  background-size: 200% 100%;
+}
+
+/* ── Muscle pill styling ─────────────────────────────────────────── */
+
+.muscle-pill {
+  @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-medium tracking-wide uppercase;
+  background: rgba(99, 102, 241, 0.1);
+  color: rgba(129, 140, 248, 0.9);
+  border: 1px solid rgba(99, 102, 241, 0.15);
+}
+
+.muscle-pill-primary {
+  background: rgba(99, 102, 241, 0.15);
+  color: rgba(165, 180, 252, 1);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+}
+
+/* ── Scrollbar styling ───────────────────────────────────────────── */
+
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* ── 3D model placeholder ────────────────────────────────────────── */
+
+.model-placeholder {
+  background: linear-gradient(
+    145deg,
+    rgba(99, 102, 241, 0.05) 0%,
+    rgba(139, 92, 246, 0.03) 50%,
+    rgba(99, 102, 241, 0.05) 100%
+  );
+  border: 1px dashed rgba(99, 102, 241, 0.2);
 }
