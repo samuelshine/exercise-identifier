@@ -10,5 +10,17 @@ ollama>=0.3.3
 chromadb>=1.0.0
 tqdm>=4.66.5
 
+# Retry logic for flaky Ollama calls
+tenacity>=9.0.0
+
+# Async file I/O (used by embed pipeline & video handler)
+aiofiles>=24.1.0
+
+# Required for FastAPI File/Form uploads (Phase 2 video endpoint)
+python-multipart>=0.0.12
+
+# AWS S3 ephemeral video storage (Phase 2)
+# boto3>=1.35.0
+
 # Video processing (Phase 2)
 # mediapipe>=0.10.0

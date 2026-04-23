@@ -2,95 +2,223 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ─── Base resets ─────────────────────────────────────────────────────────── */
+
 html {
   scroll-behavior: smooth;
+  /* Prevent layout shift from scrollbar appearing/disappearing */
+  scrollbar-gutter: stable;
 }
 
 body {
+  /* Remove the blue tap flash on mobile — we handle our own active states */
   -webkit-tap-highlight-color: transparent;
+  /* Prevent over-scroll rubber-banding from revealing the white root background */
+  overscroll-behavior: none;
 }
 
-/* Glassmorphism base */
-.glass-card {
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.03) 0%,
-    rgba(255, 255, 255, 0.01) 100%
-  );
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-}
+/* ─── Custom scrollbar ────────────────────────────────────────────────────── */
 
-.glass-card-hover:hover {
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.05) 0%,
-    rgba(255, 255, 255, 0.02) 100%
-  );
-  border-color: rgba(255, 255, 255, 0.1);
-  transition: all 300ms;
-}
-
-/* Search input glow */
-.search-glow {
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.02);
-  transition: box-shadow 0.4s ease, border-color 0.4s ease;
-}
-
-.search-glow:focus-within {
-  box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.3),
-    0 0 30px rgba(99, 102, 241, 0.12), 0 0 60px rgba(99, 102, 241, 0.06);
-  border-color: rgba(99, 102, 241, 0.4);
-}
-
-/* Confidence ring */
-.confidence-ring-track {
-  stroke: rgba(255, 255, 255, 0.06);
-}
-
-.confidence-ring-fill {
-  transition: stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1);
-  filter: drop-shadow(0 0 6px var(--ring-color));
-}
-
-/* Muscle pills */
-.muscle-pill {
-  @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-medium uppercase tracking-wide;
-  background: rgba(99, 102, 241, 0.1);
-  color: rgba(129, 140, 248, 0.9);
-  border: 1px solid rgba(99, 102, 241, 0.15);
-}
-
-.muscle-pill-primary {
-  background: rgba(99, 102, 241, 0.15);
-  color: rgba(165, 180, 252, 1);
-  border: 1px solid rgba(99, 102, 241, 0.25);
-}
-
-/* 3D model placeholder */
-.model-placeholder {
-  background: linear-gradient(
-    145deg,
-    rgba(99, 102, 241, 0.05) 0%,
-    rgba(139, 92, 246, 0.03) 50%,
-    rgba(99, 102, 241, 0.05) 100%
-  );
-  border: 1px dashed rgba(99, 102, 241, 0.2);
-}
-
-/* Scrollbar */
-::-webkit-scrollbar {
-  width: 4px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.08);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.16);
+}
+
+/* ─── Glassmorphism cards ─────────────────────────────────────────────────── */
+/* Applied on result cards, modals, and the EDP panel */
+
+@layer components {
+  .glass-card {
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.03) 0%,
+      rgba(255, 255, 255, 0.01) 100%
+    );
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .glass-card-hover {
+    transition: background 300ms ease, border-color 300ms ease, box-shadow 300ms ease;
+  }
+  .glass-card-hover:hover {
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.05) 0%,
+      rgba(255, 255, 255, 0.02) 100%
+    );
+    border-color: rgba(255, 255, 255, 0.10);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  }
+
+  /* Active / selected result card */
+  .glass-card-active {
+    background: linear-gradient(
+      135deg,
+      rgba(99, 102, 241, 0.08) 0%,
+      rgba(99, 102, 241, 0.03) 100%
+    );
+    border-color: rgba(99, 102, 241, 0.30);
+    box-shadow:
+      0 0 0 1px rgba(99, 102, 241, 0.20),
+      0 8px 32px rgba(0, 0, 0, 0.4);
+  }
+
+  /* ─── Search input ──────────────────────────────────────────────────── */
+
+  .search-input-wrap {
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.02);
+    transition: box-shadow 0.35s ease, border-color 0.35s ease;
+  }
+  .search-input-wrap:focus-within {
+    box-shadow:
+      0 0 0 1px rgba(99, 102, 241, 0.30),
+      0 0 30px rgba(99, 102, 241, 0.10),
+      0 0 60px rgba(99, 102, 241, 0.05);
+    border-color: rgba(99, 102, 241, 0.40);
+  }
+
+  /* ─── Skeleton loader ───────────────────────────────────────────────── */
+  /* Uses shimmer keyframe defined in tailwind.config.ts */
+
+  .skeleton {
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.04) 25%,
+      rgba(255, 255, 255, 0.08) 50%,
+      rgba(255, 255, 255, 0.04) 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 2s linear infinite;
+    border-radius: 6px;
+  }
+
+  /* ─── Confidence ring (SVG-driven) ─────────────────────────────────── */
+
+  .confidence-ring-track {
+    stroke: rgba(255, 255, 255, 0.05);
+  }
+  .confidence-ring-fill {
+    /* stroke-dashoffset is driven by inline CSS vars set per-component */
+    transition: stroke-dashoffset 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+    filter: drop-shadow(0 0 6px var(--ring-color, rgba(99, 102, 241, 0.6)));
+  }
+
+  /* ─── Muscle anatomy pills ──────────────────────────────────────────── */
+
+  .muscle-pill {
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-medium uppercase tracking-wider;
+    background: rgba(99, 102, 241, 0.08);
+    color: rgba(129, 140, 248, 0.85);
+    border: 1px solid rgba(99, 102, 241, 0.14);
+  }
+  .muscle-pill-primary {
+    background: rgba(239, 68, 68, 0.10);
+    color: rgba(252, 165, 165, 0.95);
+    border: 1px solid rgba(239, 68, 68, 0.20);
+  }
+  .muscle-pill-secondary {
+    background: rgba(249, 115, 22, 0.10);
+    color: rgba(253, 186, 116, 0.95);
+    border: 1px solid rgba(249, 115, 22, 0.20);
+  }
+
+  /* ─── Difficulty badge ──────────────────────────────────────────────── */
+
+  .badge-beginner     { @apply bg-emerald-500/10 text-emerald-400 border border-emerald-500/20; }
+  .badge-intermediate { @apply bg-amber-500/10   text-amber-400   border border-amber-500/20;   }
+  .badge-advanced     { @apply bg-orange-500/10  text-orange-400  border border-orange-500/20;  }
+  .badge-elite        { @apply bg-red-500/10     text-red-400     border border-red-500/20;     }
+
+  /* ─── 3D model / video placeholder ─────────────────────────────────── */
+
+  .model-placeholder {
+    background: linear-gradient(
+      145deg,
+      rgba(99, 102, 241, 0.04) 0%,
+      rgba(139, 92, 246, 0.02) 50%,
+      rgba(99, 102, 241, 0.04) 100%
+    );
+    border: 1px dashed rgba(99, 102, 241, 0.18);
+  }
+
+  /* ─── Camera preview ────────────────────────────────────────────────── */
+
+  .camera-preview {
+    /* Mirrors the front camera view horizontally — matches user expectation */
+    transform: scaleX(-1);
+    object-fit: cover;
+    border-radius: 1rem;
+  }
+
+  /* ─── Recording indicator ───────────────────────────────────────────── */
+
+  .record-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #ef4444;
+    animation: record-pulse 1.2s ease-in-out infinite;
+  }
+
+  /* ─── Touch target enforcement ──────────────────────────────────────── */
+  /* Ensures all interactive elements meet the 48×48px minimum touch target
+     as required by the PRD (gym use: sweaty hands, possible gloves) */
+
+  .touch-target {
+    @apply relative;
+  }
+  .touch-target::after {
+    content: "";
+    position: absolute;
+    inset: -8px;
+    /* Visual bounds remain unchanged; only the hit area expands */
+  }
+}
+
+/* ─── Utility layer additions ─────────────────────────────────────────────── */
+
+@layer utilities {
+  /* Gradient text — used for brand accents and hero copy */
+  .text-gradient-accent {
+    background: linear-gradient(135deg, #818cf8 0%, #6366f1 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* No scrollbar (for horizontal scroll containers like tag rows) */
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  /* Safe area insets — critical for PWA on notched iPhones */
+  .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+  .pt-safe { padding-top:    env(safe-area-inset-top);    }
+  .px-safe {
+    padding-left:  env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+
+  /* Prevent text selection on interactive UI elements (gym context: fat-finger taps) */
+  .no-select { user-select: none; -webkit-user-select: none; }
+
+  /* Full-bleed horizontal rule with fade */
+  .divider-fade {
+    border: none;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.06) 20%,
+      rgba(255, 255, 255, 0.06) 80%,
+      transparent 100%
+    );
+  }
 }

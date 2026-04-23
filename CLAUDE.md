@@ -3,7 +3,9 @@
 ## 1. Project Overview
 This project is a Progressive Web App (PWA) designed to help gym-goers identify exercises they don't know the name of. Users can input a natural language description or capture a short video, and the app will return the exact exercise along with form instructions, 3D visualizations, and alternatives.
 
-**Target Output:** A highly responsive, mobile-first PWA accessible via smartphone browsers and laptops without requiring app store downloads.
+**Target Output:** A highly responsive, mobile-first PWA accessible via smartphone browsers and laptops without requiring app store downloads. It must feature a heavily minimalistic, modern dark-mode aesthetic with world-class, smooth transitions and animations.
+
+**Full PRD & Architecture:** See [docs/PRD.md](docs/PRD.md) for the comprehensive Product Requirements Document, system architecture, API contracts, database schema, UI/UX guidelines, and phased execution roadmap.
 
 ## 2. Tech Stack Architecture
 - **Frontend (UI/UX):** Next.js (React) configured as a PWA for installability.

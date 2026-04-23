@@ -19,7 +19,8 @@ class _ORMModel(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-# --- Alias ---
+# ─── Alias ────────────────────────────────────────────────────────────────────
+
 class ExerciseAliasRead(_ORMModel):
     id: uuid.UUID
     alias: str
@@ -29,7 +30,8 @@ class ExerciseAliasCreate(BaseModel):
     alias: str = Field(min_length=1, max_length=128)
 
 
-# --- MovementDescriptor ---
+# ─── MovementDescriptor ───────────────────────────────────────────────────────
+
 class MovementDescriptorRead(_ORMModel):
     id: uuid.UUID
     category: DescriptorCategory
@@ -44,7 +46,8 @@ class MovementDescriptorCreate(BaseModel):
     text: str = Field(min_length=1)
 
 
-# --- Alternative ---
+# ─── Alternative ─────────────────────────────────────────────────────────────
+
 class ExerciseAlternativeRead(_ORMModel):
     id: uuid.UUID
     relationship_type: AlternativeRelationship
@@ -58,7 +61,8 @@ class ExerciseAlternativeCreate(BaseModel):
     note: str | None = None
 
 
-# --- Exercise ---
+# ─── Exercise ─────────────────────────────────────────────────────────────────
+
 class ExerciseBase(BaseModel):
     primary_name: str = Field(min_length=1, max_length=128)
     slug: str = Field(min_length=1, max_length=160, pattern=r"^[a-z0-9\-]+$")
@@ -71,9 +75,9 @@ class ExerciseBase(BaseModel):
 
 
 class ExerciseCreate(ExerciseBase):
-    primary_muscles: list[MuscleGroup]
+    primary_muscles: list[MuscleGroup] = Field(min_length=1)
     secondary_muscles: list[MuscleGroup] = []
-    equipment_required: list[EquipmentType]
+    equipment_required: list[EquipmentType] = Field(min_length=1)
     aliases: list[ExerciseAliasCreate] = []
     movement_descriptors: list[MovementDescriptorCreate] = []
 
@@ -90,14 +94,18 @@ class ExerciseUpdate(BaseModel):
 
 
 class ExerciseSummary(_ORMModel):
+    """Lightweight exercise representation — used in list endpoints and alternative cards."""
     id: uuid.UUID
     primary_name: str
     slug: str
     difficulty: DifficultyLevel
     movement_pattern: MovementPattern
+    primary_muscles: list[MuscleGroup]
+    equipment_required: list[EquipmentType]
 
 
 class ExerciseRead(_ORMModel):
+    """Full exercise representation — used in detail pages and search results."""
     id: uuid.UUID
     primary_name: str
     slug: str
@@ -117,7 +125,33 @@ class ExerciseRead(_ORMModel):
     alternatives_from: list[ExerciseAlternativeRead]
 
 
-# --- Search ---
+# ─── Pagination ───────────────────────────────────────────────────────────────
+
+class PaginatedExerciseList(BaseModel):
+    total: int
+    page: int
+    per_page: int
+    pages: int
+    results: list[ExerciseSummary]
+
+
+# ─── Alternatives endpoint ───────────────────────────────────────────────────
+
+class AlternativeMatch(BaseModel):
+    """A single alternative exercise with relationship context."""
+    relationship_type: AlternativeRelationship
+    note: str | None
+    exercise: ExerciseSummary
+
+
+class AlternativesResponse(BaseModel):
+    exercise_id: uuid.UUID
+    available_equipment: list[EquipmentType]
+    alternatives: list[AlternativeMatch]
+
+
+# ─── Search ───────────────────────────────────────────────────────────────────
+
 class SearchRequest(BaseModel):
     query: str = Field(min_length=3, max_length=500)
     top_k: int = Field(default=3, ge=1, le=10)
@@ -125,7 +159,7 @@ class SearchRequest(BaseModel):
 
 class SearchResultItem(BaseModel):
     rank: int
-    similarity_score: float
+    similarity_score: float = Field(ge=0.0, le=1.0)
     matched_description: str
     reasoning: str
     exercise: ExerciseRead
@@ -134,3 +168,6 @@ class SearchResultItem(BaseModel):
 class SearchResponse(BaseModel):
     query: str
     results: list[SearchResultItem]
+    # Populated only by the video search endpoint
+    pose_confidence: float | None = None
+    classified_patterns: list[str] | None = None

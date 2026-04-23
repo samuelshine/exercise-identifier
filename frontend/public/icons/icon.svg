@@ -1,0 +1,22 @@
+<svg viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Exercise Identifier">
+  <!-- Background: rounded square, near-black -->
+  <rect width="512" height="512" rx="96" fill="#09090b"/>
+
+  <!-- Barbell-shaped "I" mark — the brand mark -->
+  <!-- Top weight plate -->
+  <rect x="136" y="112" width="240" height="64" rx="16" fill="#6366f1"/>
+  <!-- Vertical bar (collar) -->
+  <rect x="224" y="176" width="64" height="160" rx="10" fill="#6366f1"/>
+  <!-- Bottom weight plate -->
+  <rect x="136" y="336" width="240" height="64" rx="16" fill="#6366f1"/>
+
+  <!-- Subtle inner glow on top plate -->
+  <rect x="136" y="112" width="240" height="64" rx="16" fill="url(#topGlow)" opacity="0.4"/>
+
+  <defs>
+    <linearGradient id="topGlow" x1="136" y1="112" x2="376" y2="176" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#818cf8"/>
+      <stop offset="100%" stop-color="#6366f1" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+</svg>

@@ -11,6 +11,29 @@ node_modules/
 .next/
 out/
 
+# PWA — generated service worker artifacts (produced by @ducanh2912/next-pwa at build time)
+frontend/public/sw.js
+frontend/public/sw.js.map
+frontend/public/workbox-*.js
+frontend/public/workbox-*.js.map
+frontend/public/worker-*.js
+frontend/public/worker-*.js.map
+frontend/public/fallback-*.js
+frontend/public/fallback-*.js.map
+
+# PWA — generated PNG icons (produced by scripts/generate-icons.mjs)
+# SVG source is tracked; PNGs are build artifacts
+frontend/public/icons/icon-192.png
+frontend/public/icons/icon-512.png
+frontend/public/icons/icon-maskable-512.png
+frontend/public/icons/apple-touch-icon.png
+frontend/public/icons/favicon-16.png
+frontend/public/icons/favicon-32.png
+
+# Screenshots (captured manually, not generated)
+# Uncomment to track them once captured:
+# !frontend/public/screenshots/
+
 # Environment
 .env
 .env.local
