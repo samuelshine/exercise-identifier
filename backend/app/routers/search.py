@@ -15,11 +15,13 @@ Video search pipeline (POST /search/video) — Phase 2 stub.
 import logging
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import get_settings
 from app.core.database import get_session
+from app.core.limiter import limiter
 from app.models.exercise import Exercise
 from app.schemas.exercise import ExerciseRead, SearchRequest, SearchResponse
 from app.services.embedding import Candidate, embed_query, search_similar
@@ -28,6 +30,7 @@ from app.services.reranker import HydratedCandidate, rerank_candidates
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/search", tags=["search"])
+_settings = get_settings()
 
 
 # ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -80,7 +83,9 @@ async def _load_exercises_by_ids(
         "Falls back to vector-similarity ordering if the LLM is unavailable."
     ),
 )
+@limiter.limit(_settings.rate_limit_search)
 async def search_by_text(
+    request: Request,
     body: SearchRequest,
     session: AsyncSession = Depends(get_session),
 ) -> SearchResponse:

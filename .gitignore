@@ -52,6 +52,10 @@ Thumbs.db
 # ChromaDB local store
 chroma_db/
 
+# Alembic working state — committed migrations live in alembic/versions/
+backend/alembic/__pycache__/
+backend/alembic/versions/__pycache__/
+
 # Test / Coverage
 .pytest_cache/
 .coverage

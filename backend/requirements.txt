@@ -6,6 +6,15 @@ asyncpg>=0.31.0
 pydantic>=2.12.0
 pydantic-settings>=2.5.2
 
+# Schema migrations
+alembic>=1.13.2
+
+# Per-IP rate limiting for the public search endpoint
+slowapi>=0.1.9
+
+# Structured (JSON) logging for production observability
+python-json-logger>=2.0.7
+
 ollama>=0.3.3
 chromadb>=1.0.0
 tqdm>=4.66.5
