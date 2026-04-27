@@ -22,7 +22,7 @@ export default function NotFound() {
 
       <Link
         href="/"
-        className="mt-6 inline-flex items-center justify-center rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-neutral-950 transition-colors hover:bg-accent/90 active:scale-[0.98] no-select"
+        className="mt-6 inline-flex items-center justify-center rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-white shadow-glow-accent transition-colors hover:bg-accent-light active:bg-accent-dim active:scale-[0.98] no-select"
       >
         Back to search
       </Link>

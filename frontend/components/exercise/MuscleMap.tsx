@@ -96,24 +96,10 @@ const MUSCLE_ZONES: Zone[] = [
   { muscles: ["calves"], view: "back", shape: "ellipse", cx: 75, cy: 252, rx: 10, ry: 18 },
 ];
 
-// Body silhouette paths — simplified outline for each view
-// These are decorative shapes that frame the muscle zones
-const FRONT_SILHOUETTE = `
-  M60,28 C70,28 76,32 78,38 C82,36 88,36 90,40 C94,44 92,52 88,56
-  C94,60 100,68 100,78 C100,88 96,94 88,98
-  C96,102 104,112 104,128 C104,148 96,162 94,170
-  C100,174 104,182 104,198 C104,220 96,238 90,256
-  C88,262 84,270 82,276 C80,280 76,282 72,282
-  C68,282 66,278 64,274 L60,266 L56,274
-  C54,278 52,282 48,282 C44,282 40,280 38,276
-  C36,270 32,262 30,256 C24,238 16,220 16,198
-  C16,182 20,174 26,170 C24,162 16,148 16,128
-  C16,112 24,102 32,98 C24,94 20,88 20,78
-  C20,68 26,60 32,56 C28,52 26,44 30,40
-  C32,36 38,36 42,38 C44,32 50,28 60,28 Z
-`;
-
-const BACK_SILHOUETTE = `
+// Body silhouette path — anatomical outline is roughly symmetric front/back,
+// so a single shared shape frames the muscle zones for either view. The
+// distinguishing visual is the muscle zone overlay, not the silhouette itself.
+const BODY_SILHOUETTE = `
   M60,28 C70,28 76,32 78,38 C82,36 88,36 90,40 C94,44 92,52 88,56
   C94,60 100,68 100,78 C100,88 96,94 88,98
   C96,102 104,112 104,128 C104,148 96,162 94,170
@@ -194,7 +180,6 @@ export function MuscleMap({ primaryMuscles, secondaryMuscles }: MuscleMapProps) 
   const primary = new Set(primaryMuscles);
   const secondary = new Set(secondaryMuscles);
   const zones = MUSCLE_ZONES.filter((z) => z.view === view);
-  const silhouette = view === "front" ? FRONT_SILHOUETTE : BACK_SILHOUETTE;
 
   return (
     <section className="px-4" aria-label="Muscle anatomy map">
@@ -204,25 +189,33 @@ export function MuscleMap({ primaryMuscles, secondaryMuscles }: MuscleMapProps) 
       </h2>
 
       {/* Front / Back toggle */}
-      <div className="mb-4 flex w-fit rounded-xl bg-surface-100 p-1" role="tablist">
-        {(["front", "back"] as const).map((v) => (
-          <button
-            key={v}
-            role="tab"
-            aria-selected={view === v}
-            onClick={() => setView(v)}
-            className={`
-              rounded-lg px-5 py-1.5 text-xs font-semibold uppercase tracking-wider
-              transition-all duration-200 no-select
-              ${view === v
-                ? "bg-surface-300 text-neutral-200 shadow-card-sm"
-                : "text-neutral-600 hover:text-neutral-400"
-              }
-            `}
-          >
-            {v}
-          </button>
-        ))}
+      <div className="relative mb-4 flex w-fit rounded-xl bg-surface-100 p-1" role="tablist">
+        {(["front", "back"] as const).map((v) => {
+          const isActive = view === v;
+          return (
+            <button
+              key={v}
+              role="tab"
+              aria-selected={isActive}
+              onClick={() => setView(v)}
+              className={`
+                relative z-10 rounded-lg px-5 py-1.5 text-xs font-semibold
+                uppercase tracking-wider transition-colors duration-200 no-select
+                ${isActive ? "text-neutral-200" : "text-neutral-600 hover:text-neutral-400"}
+              `}
+            >
+              {isActive && (
+                <motion.span
+                  layoutId="muscle-view-pill"
+                  className="absolute inset-0 rounded-lg bg-surface-300 shadow-card-sm"
+                  transition={{ type: "spring", stiffness: 420, damping: 36 }}
+                  aria-hidden="true"
+                />
+              )}
+              <span className="relative">{v}</span>
+            </button>
+          );
+        })}
       </div>
 
       {/* SVG anatomical map */}
@@ -256,7 +249,7 @@ export function MuscleMap({ primaryMuscles, secondaryMuscles }: MuscleMapProps) 
 
               {/* Body silhouette */}
               <path
-                d={silhouette}
+                d={BODY_SILHOUETTE}
                 fill="rgba(255,255,255,0.03)"
                 stroke="rgba(255,255,255,0.07)"
                 strokeWidth={1}

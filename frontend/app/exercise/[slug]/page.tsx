@@ -185,8 +185,14 @@ export default function ExercisePage() {
   }, [slug]);
 
   // ── Back navigation ────────────────────────────────────────────────────────
+  // Deep links land here with no history, so router.back() would no-op —
+  // fall back to the home page in that case.
   function goBack() {
-    router.back();
+    if (typeof window !== "undefined" && window.history.length > 1) {
+      router.back();
+    } else {
+      router.push("/");
+    }
   }
 
   // ── Render ─────────────────────────────────────────────────────────────────
