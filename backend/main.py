@@ -17,12 +17,17 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi.middleware import SlowAPIMiddleware
+from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from app.core.config import get_settings
 from app.core.errors import register_exception_handlers
 from app.core.limiter import limiter
 from app.core.logging_config import configure_logging
-from app.core.middleware import RequestIDMiddleware, SecurityHeadersMiddleware
+from app.core.middleware import (
+    BodySizeLimitMiddleware,
+    RequestIDMiddleware,
+    SecurityHeadersMiddleware,
+)
 from app.routers import exercises, search
 from app.services.embedding import get_chroma_collection
 
@@ -90,7 +95,7 @@ app.state.limiter = limiter
 # Order matters: middlewares run outermost-first on the way in, innermost-first
 # on the way out. We register from inside out, so the actual execution order
 # (request → response) is:
-#   RequestID → SecurityHeaders → SlowAPI → CORS → route
+#   RequestID → SecurityHeaders → BodySize → TrustedHost → SlowAPI → CORS → route
 # RequestID must be outermost so every log line — including rate-limit
 # rejections and CORS preflights — carries an ID.
 
@@ -103,6 +108,11 @@ app.add_middleware(
     expose_headers=["X-Request-ID"],
 )
 app.add_middleware(SlowAPIMiddleware)
+# TrustedHostMiddleware is only meaningful in production. In dev we accept
+# any host so localhost:8000, 127.0.0.1, and *.ngrok.io all work freely.
+if settings.is_production:
+    app.add_middleware(TrustedHostMiddleware, allowed_hosts=settings.trusted_hosts)
+app.add_middleware(BodySizeLimitMiddleware, max_bytes=settings.max_request_body_bytes)
 app.add_middleware(SecurityHeadersMiddleware)
 app.add_middleware(RequestIDMiddleware)
 
@@ -125,12 +135,22 @@ async def root():
     }
 
 
+@app.get("/livez", tags=["meta"])
+async def livez():
+    """
+    Liveness probe — is the process up and able to respond? Intentionally
+    does not touch any external dependency, so a degraded vector DB or
+    LLM never trips a restart loop on the ECS task.
+    """
+    return {"status": "ok"}
+
+
 @app.get("/health", tags=["meta"])
 async def health():
     """
-    Dependency health check. Used by ECS health checks and monitoring.
-    Returns 200 even if some dependencies are degraded — callers should
-    inspect the per-dependency status fields.
+    Readiness / dependency health check. Used by monitoring dashboards and
+    deeper smoke checks. Returns 200 even if some dependencies are
+    degraded — callers should inspect the per-dependency status fields.
     """
     deps: dict[str, str] = {}
 

@@ -38,35 +38,12 @@
       "purpose": "any"
     }
   ],
-  "screenshots": [
-    {
-      "src": "/screenshots/mobile-search.png",
-      "sizes": "390x844",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Search for any exercise by description"
-    },
-    {
-      "src": "/screenshots/desktop-split.png",
-      "sizes": "1440x900",
-      "type": "image/png",
-      "form_factor": "wide",
-      "label": "Desktop split-panel view"
-    }
-  ],
   "shortcuts": [
     {
-      "name": "Search by Text",
-      "short_name": "Text Search",
+      "name": "Search exercises",
+      "short_name": "Search",
       "description": "Describe an exercise in your own words",
-      "url": "/?mode=text",
-      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
-    },
-    {
-      "name": "Search by Video",
-      "short_name": "Video Search",
-      "description": "Record a short clip of the exercise",
-      "url": "/?mode=video",
+      "url": "/",
       "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
     }
   ]

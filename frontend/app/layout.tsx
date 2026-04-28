@@ -36,31 +36,13 @@ export const metadata: Metadata = {
   creator: "Exercise Identifier",
 
   // ─── PWA / Apple ──────────────────────────────────────────────────────
+  // Splash images are not generated yet — Apple falls back to the icon on a
+  // solid theme-color background, which matches our dark UI just fine.
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
     title: "Identify",
-    startupImage: [
-      // iPhone 14 Pro Max
-      {
-        url: "/splash/splash-1290x2796.png",
-        media:
-          "screen and (device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3)",
-      },
-      // iPhone 14 / 13 / 12
-      {
-        url: "/splash/splash-1170x2532.png",
-        media:
-          "screen and (device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3)",
-      },
-      // iPhone SE 3rd gen
-      {
-        url: "/splash/splash-750x1334.png",
-        media:
-          "screen and (device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)",
-      },
-    ],
   },
 
   // ─── Open Graph (sharing) ──────────────────────────────────────────────

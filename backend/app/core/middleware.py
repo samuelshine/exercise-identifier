@@ -1,14 +1,16 @@
 """
-HTTP middleware: request ID, structured access logging, security headers.
+HTTP middleware: request ID, structured access logging, security headers,
+and a hard body-size limit.
 """
 
 import logging
 import time
 import uuid
 
+from starlette import status
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
-from starlette.responses import Response
+from starlette.responses import JSONResponse, Response
 from starlette.types import ASGIApp
 
 from app.core.logging_config import request_id_var
@@ -78,3 +80,36 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
                 "max-age=63072000; includeSubDomains",
             )
         return response
+
+
+class BodySizeLimitMiddleware(BaseHTTPMiddleware):
+    """
+    Reject requests whose Content-Length exceeds the configured cap before
+    the body is read into memory. Prevents an attacker from tying up a
+    worker with an oversized payload.
+
+    The cap is only enforced on methods that carry a body. We trust the
+    Content-Length header — for chunked transfers without a length, the
+    upstream proxy (ALB / nginx) is the right place to enforce the cap.
+    """
+
+    def __init__(self, app: ASGIApp, *, max_bytes: int):
+        super().__init__(app)
+        self.max_bytes = max_bytes
+
+    async def dispatch(self, request: Request, call_next):
+        if request.method in ("POST", "PUT", "PATCH"):
+            cl = request.headers.get("content-length")
+            if cl is not None:
+                try:
+                    if int(cl) > self.max_bytes:
+                        return JSONResponse(
+                            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+                            content={
+                                "detail": f"Request body too large (max {self.max_bytes} bytes).",
+                                "request_id": request_id_var.get(),
+                            },
+                        )
+                except ValueError:
+                    pass  # malformed header — let downstream return 400
+        return await call_next(request)

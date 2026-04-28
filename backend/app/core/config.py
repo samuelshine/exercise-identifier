@@ -36,18 +36,29 @@ class Settings(BaseSettings):
     # Read endpoints are cheap; default is generous.
     rate_limit_default: str = "120/minute"
 
+    # ─── Trusted hosts (production) ───────────────────────────────────────────
+    # Comma-separated list of acceptable Host headers in production. Defaults
+    # to permissive while running in development; ops MUST override in prod.
+    trusted_hosts: Annotated[list[str], NoDecode] = ["*"]
+
+    # Hard ceiling on POST body size (bytes). 1 MiB is plenty for the text
+    # search payload and prevents an attacker from tying up a worker with
+    # a multi-megabyte body. Phase 2 video uploads bypass the API server
+    # via a presigned S3 URL — they don't pass through here.
+    max_request_body_bytes: int = 1_048_576
+
     # ─── Database ─────────────────────────────────────────────────────────────
     database_url: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/exercise-identifier"
     db_echo: bool = False
     db_pool_size: int = 5
     db_max_overflow: int = 10
 
-    @field_validator("cors_origins", mode="before")
+    @field_validator("cors_origins", "trusted_hosts", mode="before")
     @classmethod
-    def _split_cors(cls, v: object) -> object:
-        # Support CORS_ORIGINS=https://a.com,https://b.com  (comma form)
-        # in addition to JSON-array form. Pydantic-settings only parses JSON
-        # lists by default; this lets ops set the env var the obvious way.
+    def _split_csv(cls, v: object) -> object:
+        # Support FOO=a,b,c  (comma form) in addition to JSON-array form.
+        # Pydantic-settings only parses JSON lists by default; this lets ops
+        # set the env var the obvious way.
         if isinstance(v, str):
             return [s.strip() for s in v.split(",") if s.strip()]
         return v
