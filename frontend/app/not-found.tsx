@@ -17,7 +17,7 @@ export default function NotFound() {
       </h1>
       <p className="mt-1 text-sm font-medium text-neutral-300">Page not found</p>
       <p className="mt-1 max-w-xs text-sm text-neutral-500">
-        The exercise or page you're looking for doesn't exist or has moved.
+        The exercise or page you&apos;re looking for doesn&apos;t exist or has moved.
       </p>
 
       <Link

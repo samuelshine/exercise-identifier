@@ -81,11 +81,15 @@ The repo ships production-grade defaults; before you deploy, confirm:
 - `ENVIRONMENT=production` and `DEBUG=false` in the backend env. This
   disables `/docs`, hides tracebacks, and skips the dev-only `create_all`.
 - `CORS_ORIGINS` includes the deployed frontend URL.
+- `TRUSTED_HOSTS` lists the API origin's host (no scheme). Defaults to `*`
+  in dev; set explicitly in prod to defend against host header attacks.
 - `DATABASE_URL` points at a managed Postgres with TLS.
 - `alembic upgrade head` ran during deploy (do **not** rely on `create_all`).
 - `NEXT_PUBLIC_SITE_URL` is the real frontend origin (used by `sitemap.xml`).
-- Splash images referenced in `frontend/app/layout.tsx` exist in `public/splash/`
-  (or remove the `appleWebApp.startupImage` block).
+- The container image runs `uvicorn` as a non-root user (uid 10001) and
+  exposes a `/livez` HTTP healthcheck — wire it to your orchestrator's
+  liveness probe. Use `/health` for readiness / dashboards (touches
+  external deps).
 
 ---
 
@@ -116,7 +120,8 @@ docs/PRD.md       # full product + architecture spec
 
 | Method | Path                                       | Description                                  |
 | ------ | ------------------------------------------ | -------------------------------------------- |
-| GET    | `/health`                                  | Per-dependency status                        |
+| GET    | `/livez`                                   | Liveness probe (no external deps)            |
+| GET    | `/health`                                  | Readiness — per-dependency status            |
 | GET    | `/meta/enums`                              | Enum values for frontend dropdowns           |
 | POST   | `/search/text`                             | Semantic exercise search (rate-limited)      |
 | GET    | `/exercises`                               | Paginated, filterable list                   |

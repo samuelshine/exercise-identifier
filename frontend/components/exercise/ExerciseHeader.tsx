@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import { Dumbbell, Zap, RefreshCw } from "lucide-react";
 
 import {
@@ -143,7 +143,7 @@ export function ExerciseHeader({
 }
 
 // Shared motion variant — reused across all child elements
-const fadeUp = {
+const fadeUp: Variants = {
   hidden: { opacity: 0, y: 8 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.3, ease: "easeOut" } },
 };

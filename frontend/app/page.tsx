@@ -52,7 +52,7 @@ export default function Home() {
               <span className="text-gradient-accent">Identify</span>
             </h1>
             <p className="mt-2 max-w-xs text-sm leading-relaxed text-neutral-500">
-              Describe any exercise you see in the gym. We'll tell you exactly what it is.
+              Describe any exercise you see in the gym. We&apos;ll tell you exactly what it is.
             </p>
 
             {/* Example prompts — tappable to pre-fill */}

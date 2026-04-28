@@ -29,7 +29,7 @@ export default function ExerciseError({
       </div>
       <div>
         <p className="text-base font-semibold text-neutral-300">
-          Couldn't load this exercise
+          Couldn&apos;t load this exercise
         </p>
         <p className="mt-1 max-w-xs text-sm text-neutral-600">
           The page hit an unexpected error. You can retry or head back to the search.
